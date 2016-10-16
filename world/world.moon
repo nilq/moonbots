@@ -244,6 +244,31 @@ export class World
 
                         blood += mul4 * (1 - @agents[j].health / 2)
 
+                    a.in[1] = util.sign p1
+                    a.in[2] = util.sign r1
+                    a.in[3] = util.sign g1
+                    a.in[4] = util.sign b1
+                    a.in[5] = util.sign p2
+                    a.in[6] = util.sign r2
+                    a.in[7] = util.sign g2
+                    a.in[8] = util.sign b2
+
+                    a.in[9] = util.sign soaccum
+                    a.in[10] = util.sign smaccum
+
+                    a.in[12] = util.sign p3
+                    a.in[13] = util.sign r3
+                    a.in[14] = util.sign g3
+                    a.in[15] = util.sign b3
+
+                    a.in[16] = math.abs math.sin @mod_count / a.clock_f1
+                    a.in[17] = math.abs math.sin @mod_count / a.clock_f2
+
+                    a.in[18] = math.sign hearaccum
+                    a.in[19] = math.sign blood
+                    
+
+
 
     add_bots: (n) =>
         for i = 1, n
