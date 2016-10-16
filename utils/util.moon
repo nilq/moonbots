@@ -35,7 +35,7 @@ sign = (n) ->
         return 1
     n
 
-{
+export util = {
     :gauss_random,
     :randf,
     :randi,

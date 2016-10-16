@@ -106,7 +106,7 @@ class DWRAONBrain
             if mr > util.randf 0, 1
                 rc = util.randi 1, CONNS
 
-                @boxes[i].notted[rc] = !@boxes[i].notted[rc]
+                @boxes[i].notted[rc] = not @boxes[i].notted[rc]
 
             if mr > util.randf 0, 1
                 @boxes[i].type = 1 - @boxes[i].type
@@ -153,7 +153,7 @@ class Box
         @kp = util.randf 0.8, 1 -- damping stength
 
         @w = {}
-        @i = {} -- connected box index
+        @id = {} -- connected box index
         @notted = {} -- notted connected
 
         for i = 1, CONNS
