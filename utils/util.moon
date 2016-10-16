@@ -28,6 +28,7 @@ randi = (a, b) ->
 randn = (mu, sigma) ->
     m + gauss_random! * s
 
+-- not really sign ... too late!
 sign = (n) ->
     if n < 0
         return 0

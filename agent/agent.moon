@@ -38,7 +38,7 @@ export class Agent
         @hybrid = false
         @herbivore = util.randf 0, 1
 
-        @rep_counter = @herbivore * (util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1) + (1 - @herbivore) * util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1
+        @rep_count = @herbivore * (util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1) + (1 - @herbivore) * util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1
 
         @id = 0
 
@@ -70,7 +70,7 @@ export class Agent
         a2.pos.y %= conf.height
 
         a2.gen_count = @gen_count + 1
-        a2.rep_counter = a2.herbivore * (util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1) + (1 - herbivore) * util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1
+        a2.rep_count = a2.herbivore * (util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1) + (1 - herbivore) * util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1
 
         -- bad attribute passing
         a2.mut_rate1 = @mut_rate1
