@@ -12,11 +12,13 @@ export class World
 
         @closed = false
 
-        add_bots conf.num_bots
+        @\add_bots conf.num_bots
 
-        for x = 0, @fw
-            for y = 0, @fh
-                food[x][y] = 0
+        for x = 1, @fw
+            a = {}
+            for y = 1, @fh
+                a[#a + 1] = 0
+            @food[#@food + 1] = a
 
     update: (dt) =>
         @mod_count += 1
@@ -35,10 +37,10 @@ export class World
 
             food[fx][fy] = conf.food_max
 
-        set_inputs!
-        set_brains!
+        @\set_inputs!
+        --set_brains!
 
-        process_output!
+        --process_output!
 
         -- health and deaths
         for i = 1, #@agents
@@ -100,13 +102,13 @@ export class World
 
         unless @closed
             if #@agents < conf.num_bots
-                add_bots 1
+                @\add_bots 1
 
             if mod_count % 200 == 0
                 if 0.5 > util.randf 0, 1
-                    add_bots 1
+                    @\add_bots 1
                 else
-                    add_bots_crossover 1
+                    @\add_bots_crossover 1
 
     set_inputs: =>
         -- "Yo look at me, I'm not wasting memory! <3"
@@ -266,7 +268,7 @@ export class World
 
                     a.in[18] = math.sign hearaccum
                     a.in[19] = math.sign blood
-                    
+
 
 
 
@@ -276,7 +278,7 @@ export class World
             a.id = @id_count
             @id_count += 1
 
-            @agents[#agents + 1] = a
+            @agents[#@agents + 1] = a
 
     add_bots_crossover: (n) =>
         for i = 1, n

@@ -8,3 +8,4 @@ require "agent/agent"
 require "world/world"
 
 a = Agent!
+w = World!
