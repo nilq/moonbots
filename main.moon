@@ -46,7 +46,7 @@ class View
         lg.line a.pos.x, a.pos.y, a.pos.x + (conf.bot_radius * 1.5) * (math.cos a.angle + math.pi - 3 * math.pi / 16), a.pos.y + (conf.bot_radius * 1.5) * math.sin a.angle + math.pi - 3 * math.pi / 16
 
         -- body
-        lg.setColor a.color.r, a.color.g, a.color.b
+        lg.setColor a.color.r * 255, a.color.g * 255, a.color.b * 255
         lg.circle "fill", a.pos.x, a.pos.y, conf.bot_radius
 
         -- outline

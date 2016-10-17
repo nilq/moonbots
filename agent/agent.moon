@@ -9,9 +9,9 @@ export class Agent
         @spike_length = 0
 
         @color = {
-            r: 0,
-            g: 0,
-            b: 0,
+            r: util.randf 0, 255,
+            g: util.randf 0, 255,
+            b: util.randf 0, 255,
         }
 
         @dfood = 0
@@ -63,7 +63,7 @@ export class Agent
         print "Agent->age=#{@age}"
 
     init_rate: (size, r, g, b) =>
-        @icolor = {
+        @i_color = {
             :r,
             :g,
             :b,
