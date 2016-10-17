@@ -30,7 +30,7 @@ export class World
         for i = 1, #@agents
             view\draw_agent @agents[i]
 
-    update: =>
+    update: (dt) =>
         @mod_count += 1
 
         if @mod_count % 100 == 0
@@ -41,7 +41,7 @@ export class World
             @mod_count = 0
             @epochs += 1
 
-        if @mod_count % conf.food_add_freq
+        if @mod_count % conf.food_add_freq == 0
             fx = util.randi 1, @fw
             fy = util.randi 1, @fh
 
@@ -107,7 +107,7 @@ export class World
 
         for x = 1, @fw
             for y = 1, @fh
-                @food[x][y] += conf.food_growth
+                @food[x][y] += conf.food_growth * dt
 
                 if @food[x][y] > conf.food_max
                     @food[x][y] = conf.food_max

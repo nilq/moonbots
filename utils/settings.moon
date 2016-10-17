@@ -11,10 +11,10 @@ export conf = {
 
     -- for visualization
     bot_radius: 10,
-    bot_speed: 0.1,
+    bot_speed: 0.5,
 
     -- how quickly attack spike extends
-    spike_speed: 0.005,
+    spike_speed: 0.05,
     -- strength of attack spike on impact
     spike_mult: 0.5,
 
