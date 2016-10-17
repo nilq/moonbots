@@ -9,3 +9,7 @@ require "world/world"
 
 a = Agent!
 w = World!
+
+print "#agents:", #w.agents
+
+w\process_output!

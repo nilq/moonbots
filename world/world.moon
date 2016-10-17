@@ -40,7 +40,7 @@ export class World
         @\set_inputs!
         --set_brains!
 
-        --process_output!
+        @\process_output!
 
         -- health and deaths
         for i = 1, #@agents
@@ -118,13 +118,13 @@ export class World
         for i = 1, #@agents
             a = @agents[i]
             -- health
-            a.in[11] = util.sign a.health / 2
+            a.inp[11] = util.sign a.health / 2
 
             -- food
-            cx = a.pos.x / conf.cz
-            cy = a.pos.y / conf.cz
+            cx = math.floor a.pos.x / conf.cz
+            cy = math.floor a.pos.y / conf.cz
 
-            a.in[4] = @food[cx][cy] / conf.food_max
+            a.inp[4] = @food[cx][cy] / conf.food_max
 
             -- sound, smell, eyes
             p1, r1, g1, b1 = 0, 0, 0, 0
@@ -246,31 +246,175 @@ export class World
 
                         blood += mul4 * (1 - @agents[j].health / 2)
 
-                    a.in[1] = util.sign p1
-                    a.in[2] = util.sign r1
-                    a.in[3] = util.sign g1
-                    a.in[4] = util.sign b1
-                    a.in[5] = util.sign p2
-                    a.in[6] = util.sign r2
-                    a.in[7] = util.sign g2
-                    a.in[8] = util.sign b2
+                    a.inp[1] = util.sign p1
+                    a.inp[2] = util.sign r1
+                    a.inp[3] = util.sign g1
+                    a.inp[4] = util.sign b1
+                    a.inp[5] = util.sign p2
+                    a.inp[6] = util.sign r2
+                    a.inp[7] = util.sign g2
+                    a.inp[8] = util.sign b2
 
-                    a.in[9] = util.sign soaccum
-                    a.in[10] = util.sign smaccum
+                    a.inp[9] = util.sign soaccum
+                    a.inp[10] = util.sign smaccum
 
-                    a.in[12] = util.sign p3
-                    a.in[13] = util.sign r3
-                    a.in[14] = util.sign g3
-                    a.in[15] = util.sign b3
+                    a.inp[12] = util.sign p3
+                    a.inp[13] = util.sign r3
+                    a.inp[14] = util.sign g3
+                    a.inp[15] = util.sign b3
 
-                    a.in[16] = math.abs math.sin @mod_count / a.clock_f1
-                    a.in[17] = math.abs math.sin @mod_count / a.clock_f2
+                    a.inp[16] = math.abs math.sin @mod_count / a.clock_f1
+                    a.inp[17] = math.abs math.sin @mod_count / a.clock_f2
 
-                    a.in[18] = math.sign hearaccum
+                    a.inp[18] = math.sign hearaccum
                     a.in[19] = math.sign blood
 
+    process_output: =>
+        -- assign meaning
+        for i = 1, #@agents
+            a = @agents[i]
 
+            a.color.r = a.out[3]
+            a.color.g = a.out[4]
+            a.color.b = a.out[5]
 
+            a.w1 = a.out[1]
+            a.w2 = a.out[2]
+
+            a.boost = a.out[7] > 0.5
+
+            a.sound_mul = a.out[8]
+            a.give = a.out[9]
+
+            -- spike stuff
+            g = a.out[6]
+            if a.spike_length < g
+                a.spike_length += conf.spike_speed
+            elseif a.spike_length > g
+                a.spike_length = g
+
+        for i = 1, #@agents
+            a = @agents[i]
+
+            v  = Vector conf.bot_radius, 0
+            v *= Vector (math.cos math.pi / 2 + a.angle), (math.sin math.pi / 2 + a.angle)
+
+            w1p = a.pos + v
+            w2p = a.pos - v
+
+            bw1 = conf.bot_speed * a.w1
+            bw2 = conf.bot_speed * a.w2
+
+            if a.boost
+                bw1 *= conf.boost_size_mult
+                bw2 *= conf.boost_size_mult
+
+            -- movement
+            vv = w2p - a.pos
+            vv *= Vector (math.cos -bw1), (math.sin -bw1)
+
+            a.pos = w2p - vv
+            a.angle -= bw1
+
+            if a.angle < -math.pi
+                a.angle = math.pi - (-math.pi - a.angle)
+
+            vv = a.pos - w1p
+            vv *= Vector (math.cos -bw2), (math.sin -bw2)
+
+            a.pos = w1p + vv
+            a.angle += bw2
+
+            if a.angle > math.pi
+                a.angle = -math.pi + (a.angle - math.pi)
+
+            -- wrap aroung map
+            a.pos.x %= conf.width
+            a.pos.y %= conf.height
+
+        for i = 1, #@agents
+
+            cx = 1 + math.floor @agents[i].pos.x / conf.cz
+            cy = 1 + math.floor @agents[i].pos.y / conf.cz
+
+            f = @food[cx][cy]
+
+            if f > 0 and @agents[i].health < 2
+                -- eat food
+                itk = math.min f, conf.food_intake
+                speed_mul = (1 - (math.abs @agents[i].w1 + math.abs @agents[i].w2) / 2) / 2 + 0.5
+
+                -- herbivores gain more from vegetables(ground food)
+                itk *= @agents[i].herbivore * @agents[i].herbivore * speed_mul
+
+                @agents[i].health += itk
+                @agents[i].rep_count -= 3 * itk
+
+                food[cx][cy] -= math.min f, conf.food_waste
+
+        for i = 1, #@agents
+            @agents[i].dfood = 0
+
+        for i = 1, #@agents
+            if @agents[i].give > 0.5
+                for j = 1, #@agents
+                    d = (@agents[i].pos - @agents[j].pos)\length!
+
+                    if d < conf.food_sharing_distance
+                        if @agents[j].health < 2
+                            @agents[j].health += conf.food_transfer
+
+                        @agents[i].health -= conf.food_transfer
+                        @agents[j].dfood += conf.food_transfer
+                        @agents[i].dfoof -= conf.food_transfer
+
+        if @mod_count % 2 == 0
+            for i = 1, #@agents
+                for j = 1, #@agents
+                    if i == j or @agents[i].spike_length < 0.2 or @agents[i].w1 < 0.3 or @agents[i].w2 < 0.3
+                        continue
+
+                    d = (@agents[i].pos - @agents[j].pos)\length!
+
+                    if d < 2 * conf.bot_radius
+                        v = Vector 1, 0
+                        v *= Vector (math.cos @agents[i].angle), math.sin @agents[i].angle
+
+                        -- math: cos a = \frac{a*b}{|a|*|b|}
+                        diff_c = (@agents[j].pos.x * @agents[j].pos.y + @agents[i].pos.x * @agents[i].pos.y)
+                        diff_c1 = @agents[j].pos\length! * @agents[i].pos\length!
+                        diff = math.acos diff_c / diff_c1 -- some good shit right here
+
+                        if math.pi / 8 > math.abs diff
+
+                            mult = 1
+
+                            if @agents[i].boost
+                                mult = conf.boost_size_mult
+
+                            dmg = conf.spike_mult * @agents[i].spike_length * (math.max (math.abs @agents[i].w1), math.abs @agents[i].w2) * conf.boost_size_mult
+
+                            @agents[j].health -= dmg
+
+                            if @agents[i].health > 2
+                                @agents[i].health = 2
+
+                            @agents[i].spike_length = 0
+
+                            -- yellow means bot is *on fire*! nice!
+                            @agents[i]\init_rate 40 * dmg, 1, 1, 0
+
+                            v2 = Vector 1, 0
+
+                            v2 *= Vector (math.cos @agents[j].angle), math.sin @agents[j].angle
+
+                            -- math: cos a = \frac{a*b}{|a|*|b|}
+                            diff_c = (v.x * v.y + v2.x * v2.y)
+                            diff_c1 = v\length! * v2\length!
+                            adiff = math.acos diff_c / diff_c1 -- some good shit right here
+
+                            if math.pi / 2 > math.abs adiff
+                                @agents[j].spike_length = 0
 
     add_bots: (n) =>
         for i = 1, n

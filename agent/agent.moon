@@ -14,6 +14,8 @@ export class Agent
             b: 0,
         }
 
+        @dfood = 0
+
         @w1 = 0
         @w2 = 0
 
@@ -45,7 +47,17 @@ export class Agent
         @mut_rate1 = 0.003
         @mut_rate2 = 0.05
 
+        @give = 0
+
         @brain = DWRAONBrain!
+
+        @out = {}
+        for i = 1, OUTPUT_SIZE
+            @out[i] = 0
+
+        @inp  = {}
+        for i = 1, INPUT_SIZE
+            @inp[i] = 0
 
     print_self: =>
         print "Agent->age=#{@age}"

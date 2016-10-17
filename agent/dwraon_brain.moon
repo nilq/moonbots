@@ -1,9 +1,10 @@
+export *
+
 INPUT_SIZE  = 20
 OUTPUT_SIZE = 9
 CONNS       = 3
 BRAIN_SIZE  = 100
 
-export *
 ----------------------------------
 -- DWRAON: Damped Weighted Recurrent AND/OR Network
 ----------------------------------
