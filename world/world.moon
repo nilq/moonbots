@@ -30,7 +30,7 @@ export class World
         for i = 1, #@agents
             view\draw_agent @agents[i]
 
-    update: (dt) =>
+    update: =>
         @mod_count += 1
 
         if @mod_count % 100 == 0
@@ -54,7 +54,7 @@ export class World
 
         -- health and deaths
         for i = 1, #@agents
-            base_loss = 0.0002 + 0.0001 * (math.abs @agents[i].w1) + (math.abs @agents[i].w2) / 2
+            base_loss = 0.0002 + 0.0001 * ((math.abs @agents[i].w1) + (math.abs @agents[i].w2)) / 2
 
             if @agents[i].w1 < 0.1 and @agents[i].w2 < 0.1
                 base_loss = 0.0001
@@ -72,6 +72,8 @@ export class World
 
                 num_around = 0
                 for j = 1, #@agents
+                    if j == i
+                        continue
                     if @agents[j].health > 0
                         d = (@agents[i].pos - @agents[j].pos)\length!
 
@@ -81,11 +83,13 @@ export class World
                 if num_around > 0
                     -- distribute food of dead agent
                     for j = 1, #@agents
+                        if j == i
+                            continue
                         d = (@agents[i].pos - @agents[j].pos)\length!
 
                         if d < conf.food_distribution_radius
-                            @agents[j].health += 3 * (1 - @agents[j].herbivore) * (1 - @agents[j].herbivore) / num_around
-                            @agents[j].rep_count -= 2 *(1 - @agents[j].herbivore) * (1 - @agents[j].herbivore) / num_around
+                            @agents[j].health += 3 * (1 - @agents[j].herbivore)^2 / num_around
+                            @agents[j].rep_count -= 2 * (1 - @agents[j].herbivore)^2 / num_around
 
                             if @agents[j].health > 2
                                 @agents[j].health = 2
@@ -107,7 +111,7 @@ export class World
 
         for x = 1, @fw
             for y = 1, @fh
-                @food[x][y] += conf.food_growth * dt
+                @food[x][y] += conf.food_growth
 
                 if @food[x][y] > conf.food_max
                     @food[x][y] = conf.food_max
@@ -308,8 +312,10 @@ export class World
         for i = 1, #@agents
             a = @agents[i]
 
-            v  = Vector conf.bot_radius, 0
-            v *= Vector (math.cos math.pi / 2 + a.angle), (math.sin math.pi / 2 + a.angle)
+            ang = a.angle + math.pi / 2
+
+            v = Vector conf.bot_radius / 2, 0
+            v *= Vector (math.cos ang), math.sin ang
 
             w1p = a.pos + v
             w2p = a.pos - v
@@ -321,26 +327,28 @@ export class World
                 bw1 *= conf.boost_size_mult
                 bw2 *= conf.boost_size_mult
 
-            -- movement
-            vv = w2p - a.pos
-            vv *= Vector (math.cos -bw1), (math.sin -bw1)
+            ang = bw1
+            vv1 = w2p - a.pos
+            vv1 *= Vector (math.cos ang), math.sin ang
 
-            a.pos = w2p - vv
+            a.pos = w2p - vv1
             a.angle -= bw1
 
-            if a.angle < -math.pi
+            if a.angle < math.pi
                 a.angle = math.pi - (-math.pi - a.angle)
 
+            ang = bw2
             vv = a.pos - w1p
-            vv *= Vector (math.cos -bw2), (math.sin -bw2)
+            vv *= Vector (math.cos ang), math.sin ang
 
             a.pos = w1p + vv
             a.angle += bw2
 
+            print vv - vv1
+
             if a.angle > math.pi
                 a.angle = -math.pi + (a.angle - math.pi)
 
-            -- wrap aroung map
             a.pos.x %= conf.width
             a.pos.y %= conf.height
 

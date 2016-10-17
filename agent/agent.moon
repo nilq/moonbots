@@ -63,7 +63,7 @@ export class Agent
         print "Agent->age=#{@age}"
 
     init_rate: (size, r, g, b) =>
-        @i_color = {
+        @color = {
             :r,
             :g,
             :b,
