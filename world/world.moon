@@ -1,7 +1,7 @@
 export class World
     new: =>
-        @fw = conf.width / conf.cz
-        @fh = conf.height / conf.cz
+        @fw = conf.width / conf.cz + 1
+        @fh = conf.height / conf.cz + 1
 
         @epochs = 0
         @mod_count = 0
@@ -20,7 +20,17 @@ export class World
                 a[#a + 1] = 0
             @food[#@food + 1] = a
 
-    update: (dt) =>
+    draw: (view, food) =>
+        if food
+            for i = 1, @fw
+                for j = 1, @fh
+                    f = 0.5 * @food[i][j] / conf.food_max
+                    view\draw_food i, j, f
+
+        for i = 1, #@agents
+            view\draw_agent @agents[i]
+
+    update: =>
         @mod_count += 1
 
         if @mod_count % 100 == 0
@@ -32,13 +42,13 @@ export class World
             @epochs += 1
 
         if @mod_count % conf.food_add_freq
-            fx = util.randi 0, fw
-            fy = util.randi 0, fh
+            fx = util.randi 1, @fw
+            fy = util.randi 1, @fh
 
-            food[fx][fy] = conf.food_max
+            @food[fx][fy] = conf.food_max
 
         @\set_inputs!
-        --set_brains!
+        @\set_brains!
 
         @\process_output!
 
@@ -71,7 +81,7 @@ export class World
                 if num_around > 0
                     -- distribute food of dead agent
                     for j = 1, #@agents
-                        d = (@agents[i].pos - agents[j].pos)\length!
+                        d = (@agents[i].pos - @agents[j].pos)\length!
 
                         if d < conf.food_distribution_radius
                             @agents[j].health += 3 * (1 - @agents[j].herbivore) * (1 - @agents[j].herbivore) / num_around
@@ -84,6 +94,8 @@ export class World
 
         -- remove dead stuff
         for i = 1, #@agents
+            if not @agents[i]
+                continue -- this is quite weird, yes.
             if @agents[i].health <= 0
                 table.remove @agents, i
 
@@ -91,20 +103,20 @@ export class World
         for i = 1, #@agents
             if @agents[i].rep_count < 0 and @agents[i].health > 0.65
                 @\reproduce i, @agents[i].mut_rate1, @agents[i].mut_rate2
-                @agents[i].rep_count = @agents[i].herbivore * (util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1) + (1 - @herbivore) * util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1
+                @agents[i].rep_count = @agents[i].herbivore * (util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1) + (1 - @agents[i].herbivore) * util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1
 
-        for x = 0, @fw
-            for y = 0, @fh
+        for x = 1, @fw
+            for y = 1, @fh
                 @food[x][y] += conf.food_growth
 
                 if @food[x][y] > conf.food_max
-                    food[x][y] = conf.food_max
+                    @food[x][y] = conf.food_max
 
         unless @closed
             if #@agents < conf.num_bots
                 @\add_bots 1
 
-            if mod_count % 200 == 0
+            if @mod_count % 200 == 0
                 if 0.5 > util.randf 0, 1
                     @\add_bots 1
                 else
@@ -121,8 +133,8 @@ export class World
             a.inp[11] = util.sign a.health / 2
 
             -- food
-            cx = math.floor a.pos.x / conf.cz
-            cy = math.floor a.pos.y / conf.cz
+            cx = 1 + math.floor a.pos.x / conf.cz
+            cy = 1 + math.floor a.pos.y / conf.cz
 
             a.inp[4] = @food[cx][cy] / conf.food_max
 
@@ -266,8 +278,8 @@ export class World
                     a.inp[16] = math.abs math.sin @mod_count / a.clock_f1
                     a.inp[17] = math.abs math.sin @mod_count / a.clock_f2
 
-                    a.inp[18] = math.sign hearaccum
-                    a.in[19] = math.sign blood
+                    a.inp[18] = util.sign hearaccum
+                    a.inp[19] = util.sign blood
 
     process_output: =>
         -- assign meaning
@@ -350,7 +362,7 @@ export class World
                 @agents[i].health += itk
                 @agents[i].rep_count -= 3 * itk
 
-                food[cx][cy] -= math.min f, conf.food_waste
+                @food[cx][cy] -= math.min f, conf.food_waste
 
         for i = 1, #@agents
             @agents[i].dfood = 0
@@ -360,13 +372,13 @@ export class World
                 for j = 1, #@agents
                     d = (@agents[i].pos - @agents[j].pos)\length!
 
-                    if d < conf.food_sharing_distance
+                    if d < conf.food_share_dist
                         if @agents[j].health < 2
                             @agents[j].health += conf.food_transfer
 
                         @agents[i].health -= conf.food_transfer
                         @agents[j].dfood += conf.food_transfer
-                        @agents[i].dfoof -= conf.food_transfer
+                        @agents[i].dfood -= conf.food_transfer
 
         if @mod_count % 2 == 0
             for i = 1, #@agents
@@ -415,6 +427,29 @@ export class World
 
                             if math.pi / 2 > math.abs adiff
                                 @agents[j].spike_length = 0
+
+    set_brains: =>
+        for i = 1, #@agents
+            @agents[i]\tick!
+
+    reproduce: (ai, mr, mr2) =>
+        if 0.04 > util.randf 0, 1
+            mr *= util.randf 1, 10
+        if 0.04 > util.randf 0, 1
+            mr2 *= util.randf 1, 10
+
+        @agents[ai]\init_rate 30, 0, 0.8, 0 -- agent reproduced: green
+
+        for i = 1, conf.babies
+            a = @agents[ai]\reproduce mr, mr2
+            a.id = @id_count
+            @id_count += 1
+
+            @agents[#@agents + 1] = a -- baby
+
+    reset: =>
+        @agents = {}
+        add_bots conf.num_bots
 
     add_bots: (n) =>
         for i = 1, n

@@ -82,7 +82,7 @@ export class Agent
         a2.pos.y %= conf.height
 
         a2.gen_count = @gen_count + 1
-        a2.rep_count = a2.herbivore * (util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1) + (1 - herbivore) * util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1
+        a2.rep_count = a2.herbivore * (util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1) + (1 - @herbivore) * util.randf conf.rep_rate_c - 0.1, conf.rep_rate_h + 0.1
 
         -- bad attribute passing
         a2.mut_rate1 = @mut_rate1
@@ -112,6 +112,8 @@ export class Agent
 
         a2.brain = DWRAONBrain\from_brain @brain
         a2.brain\mutate mr, mr2
+
+        a2
 
     crossover: (other) =>
         a_new = Agent!
@@ -144,3 +146,6 @@ export class Agent
         a_new.brain = @brain\crossover other.brain
 
         a_new
+
+    tick: =>
+        @brain\tick @inp, @out

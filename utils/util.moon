@@ -1,6 +1,19 @@
 return_v = false
 value_v  = 0
 
+deep_copy = (org) ->
+    org_type = type org
+    copy
+    if org_type == "table"
+        copy = {}
+        for k, v in next, org, nil
+            copy[deep_copy k] = deep_copy org
+        setmetatable copy, deep_copy getmetatable org
+    else
+        copy = org
+
+    copy
+
 gauss_random = ->
     if return_v
         return_v = false
@@ -26,7 +39,7 @@ randi = (a, b) ->
     math.floor (b - a) * math.random! + a
 
 randn = (mu, sigma) ->
-    m + gauss_random! * s
+    mu + gauss_random! * sigma
 
 -- not really sign ... too late!
 sign = (n) ->
@@ -42,4 +55,5 @@ export util = {
     :randi,
     :randn,
     :sign,
+    :deep_copy,
 }

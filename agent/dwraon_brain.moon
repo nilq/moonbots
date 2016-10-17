@@ -32,7 +32,7 @@ class DWRAONBrain
 
     @from_brain: (other) =>
         brain = DWRAONBrain!
-        brain.boxes = {table.unpack other.boxes}
+        brain.boxes = table.deepcopy other.boxes
         brain
 
     tick: (inp, out) =>
@@ -86,7 +86,7 @@ class DWRAONBrain
             out[i] = @boxes[BRAIN_SIZE - i].out
 
     mutate: (mr, mr2) =>
-        for i = 0, BRAIN_SIZE
+        for i = 1, BRAIN_SIZE
 
             if mr * 3 > util.randf 0, 1
                 @boxes[i].bias += util.randn 0, mr2

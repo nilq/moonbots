@@ -1,7 +1,7 @@
 export conf = {
     -- window dimensions
-    width: 800,
-    height: 800,
+    width: 600,
+    height: 600,
 
     -- cell size in pixels, e.g. food squares
     cz: 50,
