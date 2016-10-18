@@ -1,7 +1,7 @@
 export conf = {
     -- window dimensions
-    width: 600,
-    height: 600,
+    width: 1300,
+    height: 700,
 
     -- cell size in pixels, e.g. food squares
     cz: 50,
@@ -48,8 +48,8 @@ export conf = {
     -- max food on a cell
     food_max: 0.5,
 
-    -- how often a food cell is filled : seconds
-    food_add_freq: 30,
+    -- how often a food cell is filled : iterations :P
+    food_add_freq: 50,
 
     -- how much food can be shared between agents
     food_transfer: 0.001,

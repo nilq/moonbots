@@ -312,42 +312,28 @@ export class World
         for i = 1, #@agents
             a = @agents[i]
 
-            ang = a.angle + math.pi / 2
+            off_w1 = Vector conf.bot_radius * (math.cos a.angle + -math.pi / 4), conf.bot_radius * math.sin a.angle + -math.pi / 4
+            off_w2 = Vector conf.bot_radius * (math.cos a.angle + math.pi / 4), conf.bot_radius * math.sin a.angle + math.pi / 4
 
-            v = Vector conf.bot_radius / 2, 0
-            v *= Vector (math.cos ang), math.sin ang
+            w1p = a.pos + off_w1
+            w2p = a.pos + off_w2
 
-            w1p = a.pos + v
-            w2p = a.pos - v
+            -- "boost wheel 1", "boost wheel 2" ... for general speed
+            bw1 = conf.bot_speed * a.w1 -- w1: speed of wheel one
+            bw2 = conf.bot_speed * a.w2 -- w2: ... of wheel two
 
-            bw1 = conf.bot_speed * a.w1
-            bw2 = conf.bot_speed * a.w2
-
-            if a.boost
+            if a.boost -- when boosting apply boost to general speed
                 bw1 *= conf.boost_size_mult
                 bw2 *= conf.boost_size_mult
+                -- rotate by speed?
 
-            ang = bw1
-            vv1 = w2p - a.pos
-            vv1 *= Vector (math.cos ang), math.sin ang
+            vv1 =  Vector bw1 * (math.cos math.atan2 w1p.y - a.pos.y, w1p.x - a.pos.x), bw1 * math.sin math.atan2 w1p.y - a.pos.y, w1p.x - a.pos.x
+            vv2 = Vector bw2 * (math.cos math.atan2 w2p.y - a.pos.y, w2p.x - a.pos.x), bw2 * math.sin math.atan2 w2p.y - a.pos.y, w2p.x - a.pos.x
 
-            a.pos = w2p - vv1
-            a.angle -= bw1
+            a.angle = math.atan2 (vv1 + vv2).y, (vv1 + vv2).x
 
-            if a.angle < math.pi
-                a.angle = math.pi - (-math.pi - a.angle)
-
-            ang = bw2
-            vv = a.pos - w1p
-            vv *= Vector (math.cos ang), math.sin ang
-
-            a.pos = w1p + vv
-            a.angle += bw2
-
-            print vv - vv1
-
-            if a.angle > math.pi
-                a.angle = -math.pi + (a.angle - math.pi)
+            a.pos += vv1
+            a.pos += vv2
 
             a.pos.x %= conf.width
             a.pos.y %= conf.height

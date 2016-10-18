@@ -110,6 +110,9 @@ love.load = ->
     view  = View world
 
 love.update = (dt) ->
+    conf.width  = lg.getWidth!
+    conf.height = lg.getHeight!
+
     world\update dt
 
     love.window.setTitle (string.format "Average Delta: %.7fs", love.timer.getAverageDelta!), 10, 10
