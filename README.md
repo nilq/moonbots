@@ -6,11 +6,15 @@
 ```
 $ make run
 ```
-
-or
-
-```
-$ moonc . && love .
-```
-
 ---
+
+TODO
+---
+
+- Fix different wrongly defined vector calculations: *spiking* with dot product.
+
+- Fix something about extreme movement: the common spinning thing.
+
+- Balance food consuming.
+
+- Base main loop on delta-time rather than iterations.
