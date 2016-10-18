@@ -40,7 +40,7 @@ export conf = {
     meta_mutation2: 0.05,
 
     -- how quickly food grows
-    food_growth: 0.00001,
+    food_growth: 0,
     -- how much food an agent consumes
     food_intake: 0.00325,
     -- how much food an agent wastes when eating
