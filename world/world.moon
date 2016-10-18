@@ -57,7 +57,7 @@ export class World
             base_loss = 0.0002 + 0.0001 * ((math.abs @agents[i].w1) + (math.abs @agents[i].w2)) / 2
 
             if @agents[i].w1 < 0.1 and @agents[i].w2 < 0.1
-                base_loss = 0.0001
+                base_loss = 0.001
 
             base_loss += 0.00005 * @agents[i].sound_mul
 
