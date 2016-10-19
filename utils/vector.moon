@@ -26,6 +26,16 @@ export class Vector
             @y = 1 / @y
         @
 
+    angle_between: (b) =>
+        cross = @x * b.y - @y * b.x
+        dot   = @x * b.x + @y * b.y
+
+        (math.atan2 cross, dot)
+
+    rotate: (a) =>
+        @x = @x * (math.cos a) - @y * math.sin a
+        @y = @x * (math.sin a) - @y * math.cos a
+
     @top: =>
         (Vector 0, -1)
 

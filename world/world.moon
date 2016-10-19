@@ -384,21 +384,19 @@ export class World
 
                     if d < 2 * conf.bot_radius
                         v = Vector 1, 0
-                        v *= Vector (math.cos @agents[i].angle), math.sin @agents[i].angle
+                        v\rotate @agents[i].angle
 
-                        -- math: cos a = \frac{a*b}{|a|*|b|}
-                        diff_c = (@agents[j].pos.x * @agents[j].pos.y + @agents[i].pos.x * @agents[i].pos.y)
-                        diff_c1 = @agents[j].pos\length! * @agents[i].pos\length!
-                        diff = math.acos diff_c / diff_c1 -- some good shit right here
+                        diff = v\angle_between @agents[j].pos - @agents[i].pos
 
                         if math.pi / 8 > math.abs diff
-
                             mult = 1
 
                             if @agents[i].boost
                                 mult = conf.boost_size_mult
 
-                            dmg = conf.spike_mult * @agents[i].spike_length * (math.max (math.abs @agents[i].w1), math.abs @agents[i].w2) * conf.boost_size_mult
+                            dmg = conf.spike_mult * @agents[i].spike_length * conf.boost_size_mult * math.max (math.abs @agents[i].w1), math.abs @agents[i].w2
+
+                            print dmg
 
                             @agents[j].health -= dmg
 
@@ -407,19 +405,14 @@ export class World
 
                             @agents[i].spike_length = 0
 
-                            -- yellow means bot is *on fire*! nice!
                             @agents[i]\init_rate 40 * dmg, 1, 1, 0
 
                             v2 = Vector 1, 0
+                            v2\rotate @agents[j].angle
 
-                            v2 *= Vector (math.cos @agents[j].angle), math.sin @agents[j].angle
+                            diff = v\angle_between v2
 
-                            -- math: cos a = \frac{a*b}{|a|*|b|}
-                            diff_c = (v.x * v.y + v2.x * v2.y)
-                            diff_c1 = v\length! * v2\length!
-                            adiff = math.acos diff_c / diff_c1 -- some good shit right here
-
-                            if math.pi / 2 > math.abs adiff
+                            if math.pi / 2 > math.abs diff
                                 @agents[j].spike_length = 0
 
     set_brains: =>
