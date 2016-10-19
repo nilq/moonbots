@@ -8,9 +8,11 @@ $ make run
 ```
 ---
 
-TODO
+A thing where in artificial life, represented by little creatures equipped with messy neural networks, are *forced* to fight for their *lives* in
+a chaos of imaginary blood and predator-prey dynamics.
+
+> May the odds be ever in your favor. - *table 0x1337A21*
+
 ---
 
-- Fix different wrongly defined vector calculations: *spiking* with dot product.
-
-- Add *gotta-go-fast* mode: minimal rendering and *no* delay between ticks. 
+Based on Andrej Karpathy's *ScriptBots*; rewritten and - in ways - improved by me.
