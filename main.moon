@@ -9,12 +9,15 @@ require "world/world"
 
 require "lib/deepcopy"
 
+require "lib/ini"
+
 math.randomseed os.time!
 
 lg = love.graphics
 lk = love.keyboard
 
 science_mode = true
+guides       = true
 
 local view, world
 
@@ -150,12 +153,23 @@ love.update = (dt) ->
 love.draw = ->
     view\render_scene!
 
-    lg.setColor 0, 0, 0
-    h, c = herb_carn!
-    lg.print ("Herbivores: %d\nCarnivores: %d\n\nFPS: %d\n\nEpochs: %d\nWorld closed: %s\nRetard mode: %s"\format h, c, love.timer.getFPS!, world.epochs, (tostring world.closed), (tostring not science_mode)), 10, 10
+    if guides
+        lg.setColor 0, 0, 0
+        h, c = herb_carn!
+        lg.print ("Herbivores: %d\nCarnivores: %d\n\nFPS: %d\n\nEpochs: %d\n\nWorld closed: %s\nRetard mode: %s\n\n[takes time] Press 's' to save agents' brains to clipboard\n[takes time] Press 'l' to load agents' brains from clipboard\n\nPress 't' to toggle alle this text"\format h, c, love.timer.getFPS!, world.epochs, (tostring world.closed), (tostring not science_mode)), 10, 10
 
 love.keypressed = (key) ->
     if key == "space"
         science_mode = not science_mode
     elseif key == "c"
         world.closed = not world.closed
+    elseif key == "s"
+        love.system.setClipboardText generate world.agents
+    elseif key == "l"
+        agents = load love.system.getClipboardText!
+        world.agents = {}
+        for i = 1, #agents
+            world\load_bot agents[i]
+
+    elseif key == "t"
+        guides = not guides

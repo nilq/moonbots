@@ -446,6 +446,35 @@ export class World
 
             @agents[#@agents + 1] = a
 
+    load_bot: (agent) =>
+        a = Agent!
+
+        a.id = agent.id
+
+        a.brain = agent.brain
+
+        a.herbivore = agent.herbivore
+
+        a.hybrid = agent.hybrid
+
+        a.age = agent.age
+
+        a.gen_count = agent.gen_count
+        a.rep_count = agent.rep_count
+
+        a.pos = agent.pos
+
+        a.clock_f1 = agent.clock_f1
+        a.clock_f2 = agent.clock_f2
+
+        a.mut_rate1 = agent.mut_rate1
+        a.mut_rate2 = agent.mut_rate2
+
+        a.w1 = agent.w1
+        a.w2 = agent.w2
+
+        @agents[#@agents + 1] = a
+
     add_bots_crossover: (n) =>
         for i = 1, n
             i1 = util.randi 1, #@agents
