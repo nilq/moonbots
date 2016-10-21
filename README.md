@@ -67,7 +67,7 @@ On every 60th iteration a random food field is filled (food is visualized by gra
 
 When an agent dies some food will be distributed to agents in the nearby area - if anyone's there.
 
-###TL;DR / clear describtion
+###TL;DR
 
 Agents have a green health bar to the right, blue rectangle if hybrid, underneath a red, brown or green rectangle depending on how much carnivore to herbivore the agent is. An agent has eyes. Agents kill each other with a red thing which is extended through the fron of their *body*.
 
