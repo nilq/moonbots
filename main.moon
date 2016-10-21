@@ -14,11 +14,21 @@ math.randomseed os.time!
 lg = love.graphics
 lk = love.keyboard
 
+science_mode = true
+
 local view, world
 
 class View
     new: (@world) =>
         @yes_food = true
+
+    -- no science here
+    draw_eye: (x, y) =>
+        lg.setColor 255, 255, 255
+        lg.circle "fill", x, y, 4
+
+        lg.setColor 0, 0, 0
+        lg.circle "fill", x, y, 2
 
     render_scene: =>
         @world\draw @, @yes_food
@@ -33,17 +43,18 @@ class View
         lg.setColor 255, 255, 0
         lg.circle "fill", a.pos.x, a.pos.y, r
 
-        -- eyes
-        lg.setColor 255 / 2, 255 / 2, 255 / 2
+        if science_mode
+            -- eyes
+            lg.setColor 255 / 2, 255 / 2, 255 / 2
 
-        for j = -3, 3
-            if j == 0
-                continue
-            lg.line a.pos.x, a.pos.y, a.pos.x + (conf.bot_radius * 4) * (math.cos a.angle + j * math.pi / 8), a.pos.y + (conf.bot_radius * 4) * math.sin a.angle + j * math.pi / 8
+            for j = -3, 3
+                if j == 0
+                    continue
+                lg.line a.pos.x, a.pos.y, a.pos.x + (conf.bot_radius * 4) * (math.cos a.angle + j * math.pi / 8), a.pos.y + (conf.bot_radius * 4) * math.sin a.angle + j * math.pi / 8
 
-        -- eye on back
-        lg.line a.pos.x, a.pos.y, a.pos.x + (conf.bot_radius * 1.5) * (math.cos a.angle + math.pi + 3 * math.pi / 16), a.pos.y + (conf.bot_radius * 1.5) * math.sin a.angle + math.pi + 3 * math.pi / 16
-        lg.line a.pos.x, a.pos.y, a.pos.x + (conf.bot_radius * 1.5) * (math.cos a.angle + math.pi - 3 * math.pi / 16), a.pos.y + (conf.bot_radius * 1.5) * math.sin a.angle + math.pi - 3 * math.pi / 16
+            -- eye on back
+            lg.line a.pos.x, a.pos.y, a.pos.x + (conf.bot_radius * 1.5) * (math.cos a.angle + math.pi + 3 * math.pi / 16), a.pos.y + (conf.bot_radius * 1.5) * math.sin a.angle + math.pi + 3 * math.pi / 16
+            lg.line a.pos.x, a.pos.y, a.pos.x + (conf.bot_radius * 1.5) * (math.cos a.angle + math.pi - 3 * math.pi / 16), a.pos.y + (conf.bot_radius * 1.5) * math.sin a.angle + math.pi - 3 * math.pi / 16
 
         -- body
         lg.setColor a.color.r * 255, a.color.g * 255, a.color.b * 255
@@ -94,16 +105,37 @@ class View
 
             lg.rectangle "fill", a.pos.x + xo + 6, a.pos.y + yo + 30, 6, 10
 
-        -- actual readable things: stats
-        lg.setColor 0, 0, 0
-        -- generation
-        lg.print a.gen_count, a.pos.x - conf.bot_radius * 1.5, a.pos.y + conf.bot_radius * 1.8
-        -- age
-        lg.print a.age, a.pos.x - conf.bot_radius * 1.5, a.pos.y + conf.bot_radius * 1.8 + 12
-        -- health
-        lg.print (string.format "%.2f", a.health), a.pos.x - conf.bot_radius * 1.5, a.pos.y + conf.bot_radius * 1.8  + 24
-        -- reproductions
-        lg.print (string.format "%.2f", a.rep_count), a.pos.x - conf.bot_radius * 1.5, a.pos.y + conf.bot_radius * 1.8 + 36
+        if science_mode
+            -- actual readable things: stats
+            lg.setColor 0, 0, 0
+            -- generation
+            lg.print a.gen_count, a.pos.x - conf.bot_radius * 1.5, a.pos.y + conf.bot_radius * 1.8
+            -- age
+            lg.print a.age, a.pos.x - conf.bot_radius * 1.5, a.pos.y + conf.bot_radius * 1.8 + 12
+            -- health
+            lg.print (string.format "%.2f", a.health), a.pos.x - conf.bot_radius * 1.5, a.pos.y + conf.bot_radius * 1.8  + 24
+            -- reproductions
+            lg.print (string.format "%.2f", a.rep_count), a.pos.x - conf.bot_radius * 1.5, a.pos.y + conf.bot_radius * 1.8 + 36
+        else
+            for j = -3, 3
+                if j % 2 == 0
+                    continue
+                @draw_eye a.pos.x + (conf.bot_radius * 0.95) * (math.cos a.angle + j * math.pi / 8), a.pos.y + (conf.bot_radius * 0.95) * math.sin a.angle + j * math.pi / 8
+
+            if a.sound_mul > 0
+                text = "o shit waddup"
+
+                lg.setColor 0, 0, 0
+                lg.print text, a.pos.x - (lg.getFont!\getWidth text) / 2, a.pos.y - conf.bot_radius * 3
+
+herb_carn = ->
+    h, c = 0, 0
+    for i = 1, #world.agents
+        if world.agents[i].herbivore >= 0.5
+            h += 1
+        else
+            c += 1
+    return h, c
 
 love.load = ->
     world = World!
@@ -115,7 +147,15 @@ love.update = (dt) ->
 
     world\update dt
 
-    love.window.setTitle (string.format "Average Delta: %.7fs", love.timer.getAverageDelta!), 10, 10
-
 love.draw = ->
     view\render_scene!
+
+    lg.setColor 0, 0, 0
+    h, c = herb_carn!
+    lg.print ("Herbivores: %d\nCarnivores: %d\n\nFPS: %d\n\nEpochs: %d\nWorld closed: %s\nRetard mode: %s"\format h, c, love.timer.getFPS!, world.epochs, (tostring world.closed), (tostring not science_mode)), 10, 10
+
+love.keypressed = (key) ->
+    if key == "space"
+        science_mode = not science_mode
+    elseif key == "c"
+        world.closed = not world.closed

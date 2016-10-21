@@ -127,7 +127,7 @@ export class World
                     @\add_bots_crossover 1
 
     set_inputs: =>
-        -- "Yo look at me, I'm not wasting memory! <3"
+        -- "Yo look at me, I'm not wasting CPU! <3"
         pi8  = math.pi / 8 / 2
         pi38 = pi8 * 3
 

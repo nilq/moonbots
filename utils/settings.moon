@@ -49,7 +49,7 @@ export conf = {
     food_max: 0.5,
 
     -- how often a food cell is filled : iterations :P
-    food_add_freq: 50,
+    food_add_freq: 60,
 
     -- how much food can be shared between agents
     food_transfer: 0.001,
