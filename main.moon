@@ -155,7 +155,7 @@ love.draw = ->
     if guides
         lg.setColor 0, 0, 0
         h, c = herb_carn!
-        lg.print ("Herbivores: %d\nCarnivores: %d\n\nFPS: %d\n\nEpochs: %d\n\nWorld closed: %s\nRetard mode: %s\n\n[takes time] Press 's' to save agents' brains to clipboard\n[takes time] Press 'l' to load agents' brains from clipboard\n\nPress 't' to toggle alle this text"\format h, c, love.timer.getFPS!, world.epochs, (tostring world.closed), (tostring not science_mode)), 10, 10
+        lg.print ("Herbivores: %d\nCarnivores: %d\n\nFPS: %d\n\nEpochs: %d\n\nWorld closed: %s\nRetard mode: %s\n\nPress 's' to save agents' brains to clipboard\nPress 'l' to load agents' brains from clipboard\n\nPress 't' to toggle alle this text"\format h, c, love.timer.getFPS!, world.epochs, (tostring world.closed), (tostring not science_mode)), 10, 10
 
 love.keypressed = (key) ->
     if key == "space"
