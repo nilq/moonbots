@@ -8,8 +8,7 @@ require "agent/agent"
 require "world/world"
 
 require "lib/deepcopy"
-
-require "lib/ini"
+export JSON = require "lib/json"
 
 math.randomseed os.time!
 
@@ -164,12 +163,20 @@ love.keypressed = (key) ->
     elseif key == "c"
         world.closed = not world.closed
     elseif key == "s"
-        love.system.setClipboardText generate world.agents
+        love.system.setClipboardText JSON\encode({
+            agents: world.agents
+            food: world.food
+        })
     elseif key == "l"
-        agents = load love.system.getClipboardText!
+        stuff = JSON\decode love.system.getClipboardText!
+
+        agents = stuff.agents
+
         world.agents = {}
         for i = 1, #agents
             world\load_bot agents[i]
+
+        world.food = stuff.food
 
     elseif key == "t"
         guides = not guides

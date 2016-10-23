@@ -1,2 +1,3 @@
 *.lua
 !deepcopy.lua
+!json.lua

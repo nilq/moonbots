@@ -36,6 +36,35 @@ export class Vector
         @x = @x * (math.cos a) - @y * math.sin a
         @y = @x * (math.sin a) - @y * math.cos a
 
+    @vectorify: (a) =>
+        a.__sub = (@, other) ->
+            return Vector @x - other.x, @y - other.y
+
+        a.__add = (@, other) ->
+            return Vector @x + other.x, @y + other.y
+
+        a.__div = (@, other) ->
+            if "number" == type other
+                return Vector @x / other, @y / other
+            else
+                return Vector @x / other.x, @y / other.y
+
+        a.__mul = (@, other) ->
+            if "number" == type other
+                return Vector @x * other, @y * other
+            else
+                return Vector @x * other.x, @y * other.y
+
+        a.__unm = ->
+            return Vector -@x, -@y
+
+        a.__eq = (@, other) ->
+            return @x == other.x and @y == other.y
+
+        a.__tostring = ->
+            return "Vector(#{@x}, #{@y})"
+        a
+
     @top: =>
         (Vector 0, -1)
 
