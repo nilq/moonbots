@@ -451,7 +451,7 @@ export class World
 
         a.id = agent.id
 
-        a.brain = agent.brain
+        a.brain = DWRAONBrain\from_brain agent.brain
 
         a.herbivore = agent.herbivore
 
@@ -463,6 +463,8 @@ export class World
         a.rep_count = agent.rep_count
 
         a.pos = agent.pos
+
+        setmetatable a.pos, Vector\vectorify {}
 
         a.clock_f1 = agent.clock_f1
         a.clock_f2 = agent.clock_f2
