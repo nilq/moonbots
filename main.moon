@@ -155,7 +155,7 @@ love.draw = ->
     if guides
         lg.setColor 0, 0, 0
         h, c = herb_carn!
-        lg.print ("Herbivores: %d\nCarnivores: %d\n\nFPS: %d\n\nEpochs: %d\n\nWorld closed: %s\nRetard mode: %s\n\nPress 's' to save agents' brains to clipboard\nPress 'l' to load agents' brains from clipboard\n\nPress 't' to toggle alle this text"\format h, c, love.timer.getFPS!, world.epochs, (tostring world.closed), (tostring not science_mode)), 10, 10
+        lg.print ("Herbivores: %d\nCarnivores: %d\n\nFPS: %d\n\nEpochs: %d\n\nWorld closed: %s\nRetard mode: %s\n\nPress 's' to save agents' brains to clipboard\nPress 'l' to load agents' brains from clipboard\n\nPress 't' to toggle alle this text\n\nPress 'f' to go forward one epoch"\format h, c, love.timer.getFPS!, world.epochs, (tostring world.closed), (tostring not science_mode)), 10, 10
 
 love.keypressed = (key) ->
     if key == "space"
@@ -170,13 +170,16 @@ love.keypressed = (key) ->
     elseif key == "l"
         stuff = JSON\decode love.system.getClipboardText!
 
-        agents = stuff.agents
+        if stuff
+            agents = stuff.agents
 
-        world.agents = {}
-        for i = 1, #agents
-            world\load_bot agents[i]
+            world.agents = {}
+            for i = 1, #agents
+                world\load_bot agents[i]
 
-        world.food = stuff.food
-
+            world.food = stuff.food
     elseif key == "t"
         guides = not guides
+    elseif key == "f"
+        for i = 1, 10000
+            world\update 0.03
